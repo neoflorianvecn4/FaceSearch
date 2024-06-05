@@ -1,0 +1,7 @@
+com.google.mlkit.vision.demo.test.app-androidTest-0 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\build\generated\res\resValues\androidTest\debug
+com.google.mlkit.vision.demo.test.app-androidTest-1 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\build\generated\res\rs\androidTest\debug
+com.google.mlkit.vision.demo.test.app-mergeDebugAndroidTestResources-2 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.google.mlkit.vision.demo.test.app-mergeDebugAndroidTestResources-3 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.google.mlkit.vision.demo.test.app-merged_res-4 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\build\intermediates\merged_res\debugAndroidTest
+com.google.mlkit.vision.demo.test.app-androidTest-5 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\src\androidTest\res
+com.google.mlkit.vision.demo.test.app-androidTestDebug-6 C:\Users\noefl\AndroidStudioProjects\FaceSearch\app\src\androidTestDebug\res
