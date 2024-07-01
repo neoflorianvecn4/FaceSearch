@@ -1,19 +1,3 @@
-/*
- * Copyright 2020 Google LLC. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.google.mlkit.vision.demo.kotlin
 
 import android.app.ActivityManager
@@ -53,10 +37,6 @@ import java.util.Timer
 import java.util.TimerTask
 
 /**
- * Abstract base class for ML Kit frame processors. Subclasses need to implement {@link
- * #onSuccess(T, FrameMetadata, GraphicOverlay)} to define what they want to with the detection
- * results and {@link #detectInImage(VisionImage)} to specify the detector object.
- *
  * @param <T> The type of the detected feature.
  */
 abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
@@ -70,11 +50,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
   private val fpsTimer = Timer()
   private val executor = ScopedExecutor(TaskExecutors.MAIN_THREAD)
-
-  // Whether this processor is already shut down
   private var isShutdown = false
-
-  // Used to calculate latency, running in the same thread, no sync needed.
   private var numRuns = 0
   private var totalFrameMs = 0L
   private var maxFrameMs = 0L
@@ -82,15 +58,11 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
   private var totalDetectorMs = 0L
   private var maxDetectorMs = 0L
   private var minDetectorMs = Long.MAX_VALUE
-
-  // Frame count that have been processed so far in an one second interval to calculate FPS.
   private var frameProcessedInOneSecondInterval = 0
   private var framesPerSecond = 0
 
-  // To keep the latest images and its metadata.
   @GuardedBy("this") private var latestImage: ByteBuffer? = null
   @GuardedBy("this") private var latestImageMetaData: FrameMetadata? = null
-  // To keep the images and metadata in process.
   @GuardedBy("this") private var processingImage: ByteBuffer? = null
   @GuardedBy("this") private var processingMetaData: FrameMetadata? = null
 
@@ -107,7 +79,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     )
   }
 
-  // -----------------Code for processing single still image----------------------------------------
   override fun processBitmap(bitmap: Bitmap?, graphicOverlay: GraphicOverlay) {
     val frameStartMs = SystemClock.elapsedRealtime()
 
@@ -133,7 +104,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     )
   }
 
-  // -----------------Code for processing live preview frame from Camera1 API-----------------------
   @Synchronized
   override fun processByteBuffer(
     data: ByteBuffer?,
@@ -164,8 +134,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     graphicOverlay: GraphicOverlay
   ) {
     val frameStartMs = SystemClock.elapsedRealtime()
-    // If live viewport is on (that is the underneath surface view takes care of the camera preview
-    // drawing), skip the unnecessary bitmap creation that used for the manual preview drawing.
     val bitmap =
       if (PreferenceUtils.isCameraLiveViewportEnabled(graphicOverlay.context)) null
       else BitmapUtils.getBitmap(data, frameMetadata)
@@ -183,7 +151,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
       requestDetectInImage(mlImage, graphicOverlay, bitmap, /* shouldShowFps= */ true, frameStartMs)
         .addOnSuccessListener(executor) { processLatestImage(graphicOverlay) }
 
-      // This is optional. Java Garbage collection can also close it eventually.
       mlImage.close()
       return
     }
@@ -227,11 +194,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         /* shouldShowFps= */ true,
         frameStartMs
       )
-        // When the image is from CameraX analysis use case, must call image.close() on received
-        // images when finished using them. Otherwise, new images may not be received or the camera
-        // may stall.
-        // Currently MlImage doesn't support ImageProxy directly, so we still need to call
-        // ImageProxy.close() here.
         .addOnCompleteListener { image.close() }
 
       return
@@ -244,9 +206,6 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
       /* shouldShowFps= */ true,
       frameStartMs
     )
-      // When the image is from CameraX analysis use case, must call image.close() on received
-      // images when finished using them. Otherwise, new images may not be received or the camera
-      // may stall.
       .addOnCompleteListener { image.close() }
   }
 
